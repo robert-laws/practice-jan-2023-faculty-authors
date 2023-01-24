@@ -6,8 +6,12 @@ import { AddList } from '../helpers';
 import ReactPaginate from 'react-paginate';
 
 export const Publications = () => {
-  const { publications, filteredPublications, getPublications } =
-    useContext(PublicationsContext);
+  const {
+    publications,
+    filteredPublications,
+    getPublications,
+    filterPublications,
+  } = useContext(PublicationsContext);
 
   const [filterLists, setFilterLists] = useState({
     documentType: [],
@@ -69,6 +73,34 @@ export const Publications = () => {
       getPublications();
     }
   }, [publications, getPublications]);
+
+  useEffect(() => {
+    // const filterCount = Object.keys(selectedFilters).reduce(
+    //   (acc, key) => acc + selectedFilters[key].length,
+    //   0
+    // );
+
+    const filtersArray = Object.entries(selectedFilters);
+
+    const applyFilters = (filterArray) => {
+      let filteredPublications = publications;
+
+      for (let i = 0; i < filterArray.length; i++) {
+        const list = filterArray[i][0];
+        const filters = filterArray[i][1];
+
+        if (filters.length > 0) {
+          filteredPublications = filteredPublications.filter((publication) =>
+            filters.includes(publication[list])
+          );
+        }
+      }
+
+      return filteredPublications;
+    };
+
+    filterPublications(applyFilters(filtersArray));
+  }, [selectedFilters]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [publicationsPerPage] = useState(10);
